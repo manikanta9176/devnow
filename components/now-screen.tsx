@@ -49,71 +49,83 @@ export function NowScreen() {
     : "";
 
   return (
-    <main className="mx-auto grid min-h-full w-full max-w-2xl gap-10 px-4 py-16">
-      <header className="grid gap-3">
-        <p className="font-mono text-xs tracking-[0.2em] text-signal uppercase">
-          devnow
+    <main className="mx-auto flex min-h-dvh w-full max-w-6xl flex-col px-5 pt-6 pb-40 md:px-10">
+      <header className="flex items-center justify-between">
+        <p className="text-sm font-medium tracking-tight">devnow</p>
+        <p className="flex items-center gap-2 text-sm text-muted">
+          <span className="size-2 rounded-full bg-accent" aria-hidden />
+          {shared ? `Updated ${updated}` : "Nothing shared yet"}
         </p>
-        {shared ? (
-          <div className="grid gap-3">
-            <h1 className="text-4xl leading-tight tracking-tight">{shared.text}</h1>
-            {shared.link ? (
-              <a href={shared.link} className="font-mono text-sm text-signal underline">
-                {shared.link}
-              </a>
-            ) : null}
-            <p className="font-mono text-sm text-muted">Updated {updated}</p>
-          </div>
-        ) : (
-          <h1 className="text-4xl leading-tight tracking-tight">
-            Share what you are on.
-          </h1>
-        )}
       </header>
 
+      <section className="flex flex-1 flex-col justify-end py-10">
+        {shared?.link ? (
+          <a
+            href={shared.link}
+            className="mb-6 w-fit rounded-full bg-white/80 px-3 py-1 text-sm text-accent shadow-sm"
+          >
+            {shared.link.replace(/^https?:\/\//, "")}
+          </a>
+        ) : null}
+        <h1
+          className={`max-w-5xl text-[clamp(3.25rem,8vw,7.25rem)] leading-[0.92] font-medium tracking-[-0.055em] ${
+            shared ? "text-foreground" : "text-[#c4beb4]"
+          }`}
+        >
+          {shared?.text ?? "What are you on?"}
+        </h1>
+      </section>
+
       <form
-        className="grid gap-4 rounded-lg border border-line bg-surface p-4"
+        className="fixed inset-x-0 bottom-4 z-10 mx-auto grid w-[min(100%-1.5rem,40rem)] gap-3 rounded-[28px] bg-card p-3 shadow-[0_24px_60px_rgba(22,21,19,0.12)] ring-1 ring-black/5 md:bottom-8"
         onSubmit={(event) => {
           event.preventDefault();
           void publish();
         }}
       >
-        <label className="grid gap-2 text-sm text-muted">
+        <label className="sr-only" htmlFor="status">
           What you are on
-          <textarea
-            value={draft.text}
-            onChange={(event) => setDraft({ ...draft, text: event.target.value })}
-            rows={3}
-            className={fieldClass}
-          />
         </label>
-        <label className="grid gap-2 text-sm text-muted">
-          Link
+        <input
+          id="status"
+          value={draft.text}
+          onChange={(event) => {
+            setCopied(false);
+            setDraft({ ...draft, text: event.target.value });
+          }}
+          placeholder="What are you on?"
+          className="w-full bg-transparent px-3 pt-2 text-lg outline-none placeholder:text-[#b7b1a8]"
+        />
+        <div className="flex items-center gap-2">
+          <label className="sr-only" htmlFor="link">
+            Link
+          </label>
           <input
+            id="link"
             value={draft.link}
-            onChange={(event) => setDraft({ ...draft, link: event.target.value })}
-            placeholder="https://"
-            className={fieldClass}
+            onChange={(event) => {
+              setCopied(false);
+              setDraft({ ...draft, link: event.target.value });
+            }}
+            placeholder="Link, optional"
+            className="min-w-0 flex-1 rounded-full bg-[#f6f3ee] px-4 py-3 text-sm outline-none placeholder:text-muted"
           />
-        </label>
+          <button
+            type="submit"
+            className="shrink-0 rounded-full bg-foreground px-5 py-3 text-sm font-medium text-card"
+          >
+            {copied ? "Copied" : "Copy link"}
+          </button>
+        </div>
         {error ? (
-          <p role="alert" className="text-sm text-signal">
+          <p role="alert" className="px-3 pb-1 text-sm text-danger">
             {error}
           </p>
         ) : null}
-        <button
-          type="submit"
-          className="w-fit rounded-md bg-signal px-3 py-2 text-sm font-medium text-background"
-        >
-          {copied ? "Link copied" : "Copy link"}
-        </button>
       </form>
     </main>
   );
 }
-
-const fieldClass =
-  "w-full rounded-md border border-line bg-background px-3 py-2 text-sm text-foreground outline-none focus:border-signal";
 
 function subscribeHash(listener: () => void): () => void {
   window.addEventListener("hashchange", listener);
