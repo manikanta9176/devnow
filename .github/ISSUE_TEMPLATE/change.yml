@@ -1,0 +1,32 @@
+name: Change request
+description: Ask for a change to the status page.
+title: "change: "
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Describe the job. A status still has to live in the link you copy. Nothing is stored on a server.
+  - type: textarea
+    id: job
+    attributes:
+      label: What should the page do?
+    validations:
+      required: true
+  - type: textarea
+    id: example
+    attributes:
+      label: Example
+      description: Use a fake status.
+      placeholder: |
+        Status: Reviewing the billing PR
+        Link: https://example.com/pull/12
+    validations:
+      required: false
+  - type: checkboxes
+    id: privacy
+    attributes:
+      label: Before you submit
+      options:
+        - label: I understand the status stays in the link and is not stored on a server.
+          required: true
